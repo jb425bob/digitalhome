@@ -1,0 +1,354 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>短信息</title>
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+	
+</head>
+<body>
+	<div id="head">
+		<a id="logo" href="#">logo</a>
+		<strong id="description">description</strong>
+		<div id="menu">
+			<a href="/WLZTJ/admin/index.html" class="easyui-linkbutton" data-options="plain:true">管理员</a>
+			<a href="/WLZTJ/ztj/index.html" class="easyui-linkbutton" data-options="plain:true">物流自提机</a>
+			<a href="/WLZTJ/kdy/index.html" class="easyui-linkbutton" data-options="plain:true">快递员</a>
+			<a href="/WLZTJ/kd/index.html" class="easyui-linkbutton" data-options="plain:true">快递</a>
+			<a href="/WLZTJ/sms/index.html" class="easyui-linkbutton" data-options="plain:true">短信息</a>
+		</div>
+				
+	</div>
+	<div id="content">
+		<div style="margin:20px;"></div>
+
+		<div>
+			<div style="width:742px;float:right;padding:20px;background:#fff;border:1px solid #ddd;">
+				<div class="panel" style="display:block;width:auto;">
+
+        <div id="demo"  style="padding:5px;overflow:hidden;min-height:300px">
+			<div style="margin:3px 0;"></div>
+		<div id="p" class="easyui-panel" title="编辑短信" style="width:735px;height:200px;"
+				data-options="iconCls:'icon-edit',collapsible:true,maximizable:true">
+			<div style="padding:15px">
+			
+			<form id="sms-form" method="post">
+			<table id="sms-head">
+				<tr>
+					<td><span>手机号码:</span></td>
+					<td><input id = "phones" name="_phoneNums" style="width:600px"></input></td>
+				</tr>
+			</table>
+			<table id="sms-body">
+				<tr>
+					<td>Message:</td>
+					<td><textarea id="smsmessage" name="_smsMessage" style="width:600px;height:60px;">你好！</textarea></td>
+				</tr>
+			</table>
+			</form>
+			<div>
+					<a class="easyui-linkbutton" onclick="javascript:$('#sms-form').form('clear')">清除</a>   
+					 <a class="easyui-linkbutton" onclick="sendSMS()">发送</a>
+			</div>
+			</div>
+		</div>
+			<table id="kd_sms_dg" title="快递信息" class="easyui-datagrid" style="width:735px;height:450px;"
+					url="kd_action_show.action" toolbar="#toolbar" pagination="true" rownumbers="true"
+					idField="phonenum"  pageSize="20" 
+					 >
+			<thead>
+				<tr>
+					<th data-options="field:'ck',checkbox:true"></th>
+					<th data-options="field:'boxid',width:90, align:'center' ">自提机ID</th>
+					<th data-options="field:'location', align:'center' ">自提机所在位置</th>
+					<th data-options="field:'doornum',width:40,align:'center'">箱门</th>
+					<th data-options="field:'name',align:'center'">快递员姓名</th>
+					<th data-options="field:'phone1', align:'center' ">快递员手机号</th>
+					<th data-options="field:'company',align:'center'">快递公司</th>
+					<th data-options="field:'intime',width:180,align:'center'">派件成功时间</th>
+					<th data-options="field:'state', align:'center' ,formatter:
+					function(val,rec){
+					return val=='0'?'快件没取':(val=='1'?'已取':(val=='2'?'超时':(val=='3'?'超时被取走':(val=='4'?'错误被取走':'清箱被取走'))));
+					}
+					">快递状态</th>
+					<th data-options="field:'pwd',width:80,align:'center'">取件密码</th>
+					<th data-options="field:'phonenum',width:120,align:'center'">收件人手机号码</th>
+					<th data-options="field:'smsstate',width:80,align:'center' ,formatter:
+					function(val,rec){
+					return val=='1'?'已送达':(val=='2'?'手机号错':'短信没发');
+					}">短信状态</th>
+					<th data-options="field:'pickupuser',align:'center' ,formatter:
+					function(val,rec){
+					return val=='0'?'收件人':(val=='1'?'派件人':(val=='2'?'被普通管理员取走':(val=='3'?'被超级管理员取走':'暂无')));
+					}
+					">取物人员</th>
+					<th data-options="field:'outtime',width:180,align:'center'">取走时间</th>
+				</tr>
+			</thead>
+			</table>
+			<div id = "toolbar">
+				<table>
+				<tr>
+					<td><span">快递状态:</span></td>
+					<td><input id="kd_state" name="kdstate"  class="easyui-combobox"  panelHeight="auto" data-options="
+								valueField: 'value',
+								textField: 'label',
+								data: [{
+									label: '没取快件',
+									value: '0'
+								},{
+									label: '已取快件',
+									value: '1'
+								},{
+									label: '快件超时',
+									value: '2'
+								},{
+									label: '超时被取走',
+									value: '3'
+								},{
+									label: '超时没取走',
+									value: '4'
+								}
+								]" /></td>
+					<td><span>快递员手机号:</span></td>
+					<td><input id="kdy_phonenum"></input></td>
+					<td><span>取件人手机号码:</span></td>
+					<td><input id="kd_phonenum"></input></td>
+				</tr>
+				<tr>
+					<td><span>存放时间:</span></td>
+					<td><input id="kd_intime" class="easyui-datetimebox" ></input></td>
+					<td><span>取出时间:</span></td>
+					<td><input id="kd_outtime" class="easyui-datetimebox" ></input></td>
+					<td><a href="#" class="easyui-linkbutton" plain="true" onclick="onSearch()">search</a></td>
+				</tr>
+			</table>
+			</div>
+			<div id="pwd_dlg" class = "easyui-dialog" style="width:400px;height:280;padding:10px 20px"
+			closed="true" >
+				<div class="ftitle">管理员修改密码</div>
+				<form id="pwd_fm" action="admin_action_editpwd" method="post">
+				    	<table  style="margin:0 auto">
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td>原始密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input sytle="width:50px" class="easyui-validatebox" type="password" name="_prePWD" data-options="required:true"></input></td>
+				    			
+				    		</tr>
+					    	<tr>
+				    			<td>新密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input   sytle="width:50px" class="easyui-validatebox" type="password" name="_newPWD" data-options="required:true"></input></td>	
+				    		</tr>
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td><a  class="easyui-linkbutton" onclick="submitEditForm()">修改</a></td>
+				    		</tr>
+				    	</table>	
+				</form>
+			</div>
+		  </div>
+		</div>	   
+				
+
+				   
+	 </div>	
+	    </div>
+		<div id="panel-demo">
+		<div id="admin-info" style="display:none"></div>
+	    	<table  style="margin:0 auto">
+	    		<tr>
+	    			<td>欢迎管理员：</td>
+	    			<td><a id="info"></a></td>
+	    		</tr>
+	    		<tr>
+				   	<td><a href="#" class="easyui-linkbutton"  plain="true" onclick="pwdEdit()">修改密码</a></td>
+					<td><a href="#" class="easyui-linkbutton"  plain="true" onclick="logout()">退出</a></td>
+				</tr>
+	    	</table>
+	    </div>
+<script type="text/javascript">
+$(function(){
+	//$('#p').panel('collapse', true);
+	$('#panel-demo').panel({
+		width:150,
+		height:100,
+		title:'admin'
+		});
+	$('#admin-info').panel({
+		href:'admin_action_get.action',
+		onLoad:function(result){
+			var _result = eval('(' + result + ')');
+			if(_result.privilege < 64){
+				$('#menu a:first-child').remove();
+			}
+			$('#info').text(_result.admin)}})
+	$('#kd_sms_dg').datagrid({rowStyler:function(index, row){
+		//没取快递为黄色
+		//有异常（没取，短信没发等）的为红色
+		if(row.state == '0') return 'background-color:yellow';
+		if(row.state =='2' || row.smsstate != '1') return 'background-color:red';
+	}})	
+	//$('#phones').val('xxxxx');
+			
+		});
+	 
+</script>
+	</div>
+
+	
+	<script type="text/javascript">
+				function sendSMS(){
+					//alert('xxxx');
+					 var temp_phones = $('#phones').val();
+					 var temp_messages = $('#smsmessage').val();
+					 if(temp_phones == '' || temp_messages ==''){
+						 alert('号码或者短信息不能为空');
+						 return ;
+					 }
+			     	 var url;
+					 var items = [];  
+					 var rows = $('#kd_sms_dg').datagrid('getSelections'); 
+					 if(rows.length > 0 || temp_phones !=''){
+						 //alert(rows.length);
+						 /* for(var i=0; i<rows.length; i++){  
+						     items.push(rows[i].phonenum);  
+						 }  
+						 var phonenums = items.join(';'); */
+						 url = 'sms_action_send.action';
+					//	 alert(phonenums);
+							$('#sms-form').form('submit',{
+								url:url,
+								success:function(result){
+									var msg  = eval(' ('+result+')');
+									if(msg.error){
+										alert(msg.errorMsg);
+										return ;
+										
+									}
+									var message = msg.message;
+			/* 						message = message.replace('/&lt;/g','<');
+									message = message.replace('/&gt;/g', '>'); */
+									
+									alert(message);
+									
+									  } });
+						 
+					 }
+					 else{
+						 alert("请选择要发送短信的快递");
+					 }
+					 
+				}
+				function onSearch(){
+					$('#kd_sms_dg').datagrid('load', {
+						kd_state:$('#kd_state').combobox('getValue'),
+						kdy_phonenum:$('#kdy_phonenum').val(),
+						kd_phonenum:$('#kd_phonenum').val(),
+						kd_intime:$('#kd_intime').datetimebox('getValue'),
+						kd_outtime:$('#kd_outtime').datetimebox('getValue')
+					});
+				}
+				function logout(){
+					$.post('admin_action_logout.action', function(result){
+						if(result.ret){
+							alert("退出成功！");
+							location.href = "/WLZTJ/";
+						}
+					},'json');
+				}
+				
+				$('#kd_sms_dg').datagrid({onSelect : function(rowIndex, rowData){
+					//alert(rowData.phonenum);
+					
+					var phoneNums = $('#phones').val();
+					if(phoneNums != ''){
+						var temp = rowData.phonenum + ';';
+						if(phoneNums.indexOf(temp) == -1)
+						$('#phones').val(phoneNums + temp );
+					}
+					else {
+						$('#phones').val(rowData.phonenum + ';');
+					}
+				},onUnselect:function(rowIndex, rowData){
+					//alert(rowData.phonenum);
+					 var phoneNums = $('#phones').val();
+					 /* alert(phoneNums);
+					 var txt = 'hello world';
+					 alert(txt.replace('h','xx')); */
+					
+					$('#phones').val(phoneNums.replace(rowData.phonenum + ';', '')); 
+				},
+				 onSelectAll:function(rowIndwx, rowData){
+					 
+					 var items = [];  
+					 var rows = $('#kd_sms_dg').datagrid('getSelections'); 
+					 for(var i=0; i<rows.length; i++){  
+						items.push(rows[i].phonenum);  
+					 }  
+					 var phonenums = items.join(';');
+					 $('#phones').val(phonenums);
+				 },
+				 onUnselectAll:function(rowIndex, rowData){
+					 $('#phones').val('');
+				 }
+				})
+								function pwdEdit(){
+					$('#pwd_dlg').dialog('open').dialog('setTitle', '修改密码');
+				}
+				function submitEditForm(){
+					$('#pwd_fm').form('submit',{
+							success:function(_ret){   
+									//alert(_ret);
+									if(_ret == 1){
+										alert("修改密码成功！")
+										 $('#pwd_dlg').dialog('close');
+									}
+							       
+									
+									else
+										alert("修改密码出错！请确保输入的原始密码正确。")
+								
+								  } });
+				}
+				
+				
+	</script>
+	<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+</body>
+</html>

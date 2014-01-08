@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+</head>
+</head>
+<body>
+	<h2>Basic Combo</h2>
+	<div class="demo-info" style="margin-bottom:10px">
+		<div class="demo-tip icon-tip"></div>
+	</div>
+	<a href="javascript:void(0)" class="easyui-linkbutton" onclick="$('#notify_dlg').dialog('open');$('#p2').panel('close');
+ 		$('#p3').panel('close');">Open</a>
+	
+	<div id="notify_dlg" class="easyui-dialog" data-options="modal:true,closed:true" style="width:400px;height:350px;padding:10px 20px"
+			closed="true" buttons="#buttons">
+			<form id="member_fm" method="post">
+			<div >
+				<div style="color:#99BBE8;background:#fafafa;padding:5px;width:60px">消息内容:</div>
+				<textarea id="message" style="width:302px;height:100px;">这是一条推送消息！</textarea>
+		    </div>
+		    <div id="sp">
+				<div style="color:#99BBE8;background:#fafafa;padding:5px;width:60px">用户范围:</div>
+				<input type="radio" name="lang" value="1"><span>所有人</span>
+				<input type="radio" name="lang" value="2"><span>组用户</span>
+				<input type="radio" name="lang" value="3"><span>单个用户</span>		
+		    </div>
+	     	<div id="p2" class="easyui-panel" style="width:320px;height:204px" data-options="iconCls:'icon-save',collapsible:true,minimizable:true,maximizable:true,closable:true">
+		     	<table id="group_dg"  class="easyui-datagrid" style="width:318px;height:200px"
+				 url="" singleSelect="true"  pagination="true" nowrap="false" rownumbers="true"   pageSize="10">
+		    	<thead>
+				<tr>
+					<th data-options="field:'sncode', align:'center'">sn号</th>
+					<th data-options="field:'password', align:'center'">密码</th>	
+				</tr>
+			    </thead>
+	        	</table>
+		    </div>
+		    <div id="p3" class="easyui-panel" style="width:320px;height:204px" data-options="iconCls:'icon-save',collapsible:true,minimizable:true,maximizable:true,closable:true">
+			    <table id="user_dg"  class="easyui-datagrid" style="width:318px;height:200px"
+				url="notify_action_showUser.action" singleSelect="true"  pagination="true" nowrap="false" rownumbers="true"   pageSize="10">
+			    <thead>
+				<tr>
+					<th data-options="field:'channelid', align:'center'">密码</th>
+					<th data-options="field:'userid', align:'center', width:80">省份</th>	
+				</tr>
+			    </thead>
+		        </table>		
+		    </div>
+		    </form>
+		    </div>
+			<div id="buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="sendNotify()"> Notify</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" cionCls="icon-cancel" onclick="javascript:$('#notify_dlg').dialog('close')">Cancel</a>	
+			</div>
+	<script type="text/javascript">
+	var laststate='';
+	var currentState = '';
+		$(function(){
+			//$('#device_dg').datagrid();
+	 		
+	 		//$('#p').panel('collapse', true);
+	 		
+		});
+		$('#sp input').click(function(){
+			
+			var v = $(this).val();
+			if((laststate == ''&& v =='1')){
+				alert(v);
+			}else if(laststate == '2' && v == '1'){
+				$('#p2').panel('close');
+				alert(v);
+			}else if(laststate == '3' && v == '1'){
+				$('#p3').panel('close');
+				alert(v);
+			}else if(laststate == '1' && v == '1'){
+				
+			}
+			
+			if(laststate == '' && v == '2'){
+				$('#p2').panel('open');
+			} else if(laststate == '2' && v == '2'){
+				//$('#p2').panel('close');
+			} else if(laststate == '3' && v == '2'){
+				$('#p3').panel('close');
+				$('#p2').panel('open');
+			} else if(laststate == '1' && v == '2'){
+				$('#p2').panel('open');
+			}
+			
+			if(laststate == '' && v == '3'){
+				$('#p3').panel('open');
+			} else if(laststate == '3' && v == '3'){
+				//$('#p2').panel('close');
+				
+			} else if(laststate == '2' && v == '3'){
+				$('#p2').panel('close');
+				$('#p3').panel('open');
+			} else if(laststate == '1' && v == '3'){
+				$('#p3').panel('open');
+			}
+			var s = $(this).next('span').text();
+			laststate = v;
+			currentState = v;
+			//$('#p').panel('open');
+			//$('#p').panel('expand', true);
+		}); 
+		function sendNotify(){
+			//$('#user_dg').datagrid()
+			var selected;
+			var keyValue;
+			var content = $('#message').val();
+			alert(content);
+			if(currentState == '2'){
+				selected = $('#group_dg').datagrid('getSelected');
+				if(selected){
+					keyValue = selected.tag;
+				}
+			} else if (currentState == '3'){
+				selected = $('#user_dg').datagrid('getSelected');
+				alert(selected);
+				if(selected){
+					 keyValue = selected.userid + ':' + selected.channelid;
+					alert(keyValue);
+				}
+			}
+			if(keyValue == '' && currentState =='1'){
+				alert("请选择要发送推送消息的组或者个人");
+				return ;
+			}
+			if(content == ''){
+				alert("推送消息不能为空");
+				return ;
+			}
+			$.post('notify_action_sendNotify.action', {type:currentState, content:content, tag:keyValue}, 
+					function(result){
+				alert('send');
+				
+			}, 'json');
+		}
+	</script>
+</body>
+</html>

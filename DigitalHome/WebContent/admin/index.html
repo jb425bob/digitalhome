@@ -1,0 +1,327 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta charset="UTF-8">
+	 <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+     <META HTTP-EQUIV="Cache-Control" CONTENT="no-cache">
+     <META HTTP-EQUIV="Expires" CONTENT="0">
+	<title>管理员信息</title>
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+	 <script src="./json/CityJson.js" type="text/javascript"></script>
+    <script src="./json/ProJson.js" type="text/javascript"></script>
+    <script src="./json/DistrictJson.js" type="text/javascript"></script>
+
+	
+</head>
+<body>
+	
+		<!--  --><div class="demo-info">
+		<div class="demo-tip icon-tip"></div>
+	</div>
+	<div style="margin:10px 0;"></div>
+	<div id="main_wrapper" style="width:900px;margin-left:20px;overflow:hidden;">
+				<div class="panel" style="display:block;width:auto;">
+		<!--  <div id="panel-demo" style="float:top">
+		<div id="admin-info" style="display:none"></div>
+	    	<table  style="margin:0 auto right">
+	    		<tr>
+	    			<td>欢迎管理员：</td>
+	    			<td><a id="info" ></a></td>
+				   	<td><a href="#" class="easyui-linkbutton" iconCls="icon-reload" plain="true" float="left" onclick="pwdEdit()">修改密码</a></td>
+				   	<td><a href="#" class="easyui-linkbutton" iconCls="icon-back" plain="true" float="left"onclick="logout()">退出</a></td>
+				   	
+				</tr>
+	    	</table>
+	    </div>	--> 		
+			<table id="user_dg" class="easyui-datagrid" style="width:820px;height:350px;"
+					url="admin_action_show.action" toolbar="#toolbar" pagination="true"
+					rownumbers="true"  singleSelect="true" pageSize="10" 
+					 >
+			<thead>
+				<tr>
+					<th data-options="field:'name',width:120, align:'center'">管理员账号</th>
+					<th data-options="field:'province',width:90,align:'center' ">省</th>
+					<th data-options="field:'city',width:90,align:'center'">市</th>
+					<th data-options="field:'zone',width:90,align:'center'">区</th>
+					<th data-options="field:'identity',width:120,align:'center' ,formatter:
+					function(val,rec){
+					return val=='0'?'超级管理员':(val=='1'?'省级管理员':(val=='2'?'市级管理员':(val=='3'?'区级管理员':未知管理员)));
+					}
+					">管理员权限</th>
+					
+				</tr>
+			</thead>
+			</table>
+						
+			<div id = "toolbar">
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newUSER()">增加管理员</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="editUSER()">编辑管理员</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="removeUSER()"">删除管理员</a>
+			</div>
+			<div id="dlg" class="easyui-dialog" style="width:400px;height:280;padding:10px 20px"
+					closed="true" buttons="#dlg-buttons" >
+				<div class="ftitle"> 编辑管理员信息</div>
+				<form id="fm" method="post">
+					<div class="fitem">
+						<label>管理员账号：</label>
+						<input id="name" name="name"  class="easyui-validatebox" required="true" >
+						 
+					</div>		
+					
+					<div class="fitem">
+						<label>管理员权限：</label>
+						<input  id="i" name="identity"  class="easyui-combobox" panelHeight="90px" data-options="
+								valueField: 'value',
+								textField: 'label',
+							
+								data: [{
+									label: '区级管理员',
+									value: '3',
+									selected:true
+								},{
+									label: '市级管理员',
+									value: '2',
+								},{
+									label: '省级管理员',
+									value: '1',
+								},{
+									label: '超级管理员',
+									value: '0',
+									
+								}]" 
+								/>
+					</div>		
+					<div class="fitem">
+						<label>所在省：</label>
+						<select id="p" style="width:132px;height:30" name="province" >
+						<option value="" selected="selected" >无</option>
+						</select>	
+					</div>		
+					<div class="fitem">
+						<label>所在市：</label>
+						<select id="c"  style="width:132px;height:30" name="city">
+						<option value="" selected="selected" >无</option>
+						</select>
+					</div>	
+				<div class="fitem">
+						<label>所在区：</label>
+						<select id="z"  style="width:132px;height:30" name="zone">	
+						<option value="" selected="selected" >无</option>
+                         </select>
+					</div>			
+				</form>
+			</div>
+			<div id="dlg-buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="save()"> Save</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+				
+			</div>
+			</div>
+			
+	    </div>
+	    
+	   
+	    
+
+	 
+	    <script type="text/javascript">
+/*$(function(){
+	$('#panel-demo').panel({
+		width:742,
+		height:60,
+		title:'admin'
+		});
+	$('#admin-info').panel({
+		href:'admin_action_get.action',
+		onLoad:function(result){
+			var _result = eval('(' + result + ')');
+			$('#info').text(_result.admin)}})
+			
+		});
+	    
+             */ 
+</script>
+	<script type="text/javascript">
+	$.ajaxSetup ({
+   cache: false //关闭AJAX相应的缓存
+});
+			var url;
+			 function newUSER(){
+			
+				
+				 $('#dlg').dialog('open').dialog('setTitle', '添加管理员');
+				 $('#fm').form('clear');
+				 $("#c option:gt(0)").remove();
+				  $("#z option:gt(0)").remove();
+				   $("#name").removeAttr("disabled");
+	  			   $("#name").blur(function(){ 			
+               $.post('admin_action_valid.action?id='+ $('#name').val()+ '&time='+(new Date().getTime()), function(result){
+									if(result.valid){
+										alert("用户名已被使用")
+										$(this).remove();
+									} 
+								}, 'json')});
+								   
+				 url = 'admin_action_add.action';
+				
+			 }
+			 function editUSER(){
+
+				 var row = $('#user_dg').datagrid('getSelected');
+				 if(row){
+				     
+					 $('#dlg').dialog('open').dialog('setTitle', '编辑管理员');
+					  $('#fm').form('load', row);	
+					 $('#fm').form('load', row);		 
+				     $("#c option:gt(0)").remove();
+				     $("#z option:gt(0)").remove();
+				      $("#name").attr("disabled","disabled");
+					 url = 'admin_action_edit.action' + '?id=' + row.name ;
+				 }
+				 
+			 }
+			 function save(){
+				 $('#fm').form('submit', {
+					 url:url,
+					 onSubmit: function(){
+						 return $(this).form('validate');
+					 },
+				 	 success: function(result){
+				 		 var result  = eval(' ('+result+')');
+				 		 if(result.error){
+				 			 $.messager.show({
+				 				 title: 'Error',
+				 				 msg: result.errorMsg
+				 			 })
+				 		 } else{
+				 			 alert("success");
+				 			 $('#dlg').dialog('close');
+				 			 $('#user_dg').datagrid('reload');
+				 		 }
+				 	 }
+				 })	;
+			 }
+				function removeUSER(){
+					
+					var row = $('#user_dg').datagrid('getSelected');
+					if(row){
+						$.messager.confirm('Confirm', '确定删除此管理员账号吗?', function(r){
+							if(r){
+								$.post('admin_action_remove.action?id='+ row.name, function(result){
+									if(!result.error){
+										alert("删除成功！")
+										$('#user_dg').datagrid('reload');
+									} else{
+									
+										$.messager.show({
+											title: 'Error',
+											msg: result.errorMsg
+										});
+									}
+								}, 'json')
+							}
+						});
+					}
+				}
+		/*	function pwdEdit(){
+					$('#pwd_dlg').dialog('open').dialog('setTitle', '修改密码');
+				}
+				function submitEditForm(){
+					$('#pwd_fm').form('submit',{
+							success:function(_ret){   
+									//alert(_ret);
+									if(_ret == 1){
+										alert("修改密码成功！")
+										 $('#pwd_dlg').dialog('close');
+									}
+															else
+										alert("修改密码出错！请确保输入的原始密码正确或者新密码与确认密码一致！");
+										$('#pwd_dlg').dialog('close');
+										
+								
+								  } });
+				}
+				function logout(){
+					$.post('admin_action_logout.action', function(result){
+						if(result.ret){
+							alert("退出成功！");
+							location.href = "/DigitalHome/";
+						}
+					},'json');
+				}	
+				
+				*/
+			</script>
+
+   	 <script type="text/javascript">
+      
+        var selValue1;
+        var selValue2;
+    $(function () {$.each(pro, function (k, p) { 
+           var option = "<option value='" + p.ProName + "'>" + p.ProName + "</option>";
+           $("#p").append(option);
+            }); 
+                $("#p").change(function () {
+                 $("#c option:gt(0)").remove();
+                var selLabel1 = $("#p").val();   
+                $.each(pro,function(k,p){
+                if(p.ProName==selLabel1)
+                 selValue1=p.ProID;
+                });    
+                $.each(cit, function (k, p) { 
+                    if (p.ProID == selValue1) {
+                        var option = "<option value='" + p.CityName + "'>" + p.CityName + "</option>";
+                        $("#c").append(option);
+                    }
+                });
+                 
+            }); 
+            $("#c").change(function () {
+                
+               $("#z option:gt(0)").remove(); 
+               var sellabel2 = $(this).val();
+                $.each(cit,function(k,p){
+                if(p.CityName==sellabel2)
+                 selValue2=p.CityID;
+                });    
+                $.each(dis, function (k, p) {
+                    if (p.CityID == selValue2) {
+                        var option = "<option value='" + p.DisName + "'>" + p.DisName + "</option>";
+                        $("#z").append(option);
+                    }
+                }); 
+            }); 
+           });
+    </script>
+	<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+</body>
+</html>
+	

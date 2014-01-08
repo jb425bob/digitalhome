@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>九洲数字家庭</title>
+	<link href="styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="themes/demo.css">
+	<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="scripts/datagrid-detailview.js"></script>
+	<script src="./json/CityJson.js" type="text/javascript"></script>
+    <script src="./json/ProJson.js" type="text/javascript"></script>
+    <script src="./json/DistrictJson.js" type="text/javascript"></script>
+      <script src="scripts/jscharts.js" type="text/javascript"></script>
+</head>
+<body style="margin:0;backgroud-color:#ffffff;">
+
+	<div id="header" style="background:transparent url(./images/head-bg.png) repeat-x;height:60px;text-align;left;">
+		<div id="containter" style="margin:0 auto;width:985px;">
+			<a href="http://www.jiuzhou.com.cn/" target="_blank"><img src="./images/logo.png"/></a>
+		</div>
+	</div>
+	<div id="main_wrapper" style="width:985px;margin:0 auto;overflow:hidden;">
+	
+	<div style="margin:10px 0;"></div>
+	<div id="tt"  class="easyui-tabs" data-options="tools:'#tab-tools',plain:true" style="width:985px;height:420px">
+		<div title="管理员"  data-options="href:'./admin/index.html'" tools="#p-tools-2"   cache="true">	
+	<!--  	<div id="p" data-options="href:'customtools.html',border:false" style="padding:20px;overflow:hidden;min-height:300px">
+	</div>-->
+
+        </div>
+		<div title="用户管理" data-options="href:'./family_members/index.html'" tools="#p-tools-2"  cache="true">
+        </div>
+		<div title="消息推送" data-options="href:'./family_notify/index.html'" tools="#p-tools-2"   cache="true">
+        </div>
+		<div title="设备信息采集" data-options="href:'./family_device/index.html'" tools="#p-tools-2" cache="true">
+        </div>
+		<div title="系统监控" data-options="href:'./monitor/index.html'" tools="#p-tools-2"  cache="true">
+        </div>
+	</div>
+			 <div id="pwd_dlg" class = "easyui-dialog" style="width:400px;height:280;padding:10px 20px"
+			closed="true" >
+				<div class="ftitle">管理员修改密码</div>
+				<form id="pwd_fm" action="admin_action_editpwd" method="post">
+				    	<table  style="margin:0 auto">
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td>原始密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input sytle="width:50px" class="easyui-validatebox" type="password" name="_prePWD" data-options="required:true"></input></td>
+				    			
+				    		</tr>
+					    	<tr>
+				    			<td>新密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input   sytle="width:50px" class="easyui-validatebox" type="password" name="_newPWD" data-options="required:true"></input></td>	
+				    		</tr>
+				    		<tr>
+				    			<td>请再次输入新密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input   sytle="width:50px" class="easyui-validatebox" type="password" name="_rePWD" data-options="required:true"></input></td>	
+				    		</tr>
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td><a  class="easyui-linkbutton" onclick="submitEditForm()">修改</a></td>
+				    		</tr>
+				    	</table>	
+				</form>
+			</div>
+	<div id="tab-tools">
+		<td>欢迎：</td>
+	    <td><a id="info" ></a></td>
+		<td><a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-reload" plain="true" float="left" onclick="pwdEdit()">修改密码</a></td>
+		<td><a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" plain="true" float="left"onclick="logout()">退出</a></td>
+	</div>
+	</div>
+	<div style="margin:10px 0;background-color:rgba(0,51,102,0.9);margin:0 auto;width:985px;">
+	<div class="container" style="padding:0 20px;">
+	<h4>ABOUT</h4>
+	<p>九洲中央研究所数字家庭后台管理系统</p>
+	<p style="color:#577A9C">
+	 @2013 JIU ZHOU
+	</p>
+	</div>
+	</div>
+	</div>
+	<script type="text/javascript">
+		/*$(function(){$('#tab-tools').({
+	   href:'admin_action_get.action',
+		onLoad:function(result){
+			var _result = eval('(' + result + ')');
+			$('#info').text(_result.admin)}});
+		});*/
+     $(function(){
+     $.post('admin_action_get.action', function(result){
+     $('#info').text(result.identityName+"管理员"+result.admin);
+     }, 'json')
+     });
+	    /* $(function(){
+		    $('#tt').tabs('add', {
+			   title:'hh',
+			   content:'<iframe scrolling="auto" frameborder="0"  src="customtools.html" style="width:100%;height:100%;"></iframe>'
+		   });
+	    	    $('#tt').tabs('add', {
+			   title:'hh',
+			   href:'./customtools.html'
+		   }); 
+	   })  */
+		/* var index = 0;
+		function addPanel(){
+			index++;
+			$('#tt').tabs('add',{
+				title: 'Tab'+index,
+				content: '<div style="padding:10px">Content'+index+'</div>',
+				closable: true
+			});
+		}
+		function removePanel(){
+			var tab = $('#tt').tabs('getSelected');
+			if (tab){
+				var index = $('#tt').tabs('getTabIndex', tab);
+				$('#tt').tabs('close', index);
+			}
+		} */
+	</script>
+	<script type="text/javascript">
+		           function pwdEdit(){
+					$('#pwd_dlg').dialog('open').dialog('setTitle', '修改密码');
+				}
+				function submitEditForm(){
+					$('#pwd_fm').form('submit',{
+							success:function(_ret){   
+									//alert(_ret);
+									if(_ret == 1){
+										alert("修改密码成功！")
+										 $('#pwd_dlg').dialog('close');
+									}
+															else
+										alert("修改密码出错！请确保输入的原始密码正确或者新密码与确认密码一致！");
+										$('#pwd_dlg').dialog('close');
+										
+								
+								  } });
+				}
+				function logout(){
+					$.post('admin_action_logout.action', function(result){
+						if(result.ret){
+							alert("退出成功！");
+							location.href = "/DigitalHome/";
+						}
+					},'json');
+				}	
+</script>
+</body>
+</html>

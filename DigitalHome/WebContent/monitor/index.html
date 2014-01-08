@@ -1,0 +1,184 @@
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="http://www.jeasyui.com/easyui/datagrid-detailview.js"></script>
+	<script type="text/javascript" src="../scripts/jscharts.js"></script>
+</head>
+
+<body>
+		<div class="demo-info">
+			<div class="demo-tip icon-tip"></div>
+		</div>
+		<div style="margin:10px 0;"></div>
+		<div id="main_wrapper" style="width:900px;margin-left:20px;overflow:hidden;">	
+
+		
+		<div id="info" style="display:none"></div>
+	    	<table id="infotable" style="margin:0 auto">
+	    	<tr>
+	    		    <td><span>当前时间</span></td>
+					<td><textarea id="aDate" style="height:20px;resize:none"></textarea></td>	
+					<td>内存使用率</td>
+					<td><textarea id="memPerc" style="height:20px;resize:none"></textarea></td>
+					<td>CPU使用率</td>
+					<td><textarea id="cpuPerc" style="height:20px;resize:none"></textarea></td>
+					<td>网络连接数</td>
+					<td><textarea id="xnetNums" style="height:20px;resize:none"></textarea></td>
+				   	<a  class="easyui-linkbutton" iconCls="icon-add" plain="true" float="right" onclick="start()">开始采集</a>
+				    <a  class="easyui-linkbutton" iconCls="icon-cancel" plain="true" float="right"onclick="stop()">停止采集</a>
+				   	<a  class="easyui-linkbutton" iconCls="icon-print" plain="true" float="right" onclick="send()">发送邮件</a>
+					<input id="email_add" name="email_add"></input>
+				</tr>
+	    		<tr>
+	  
+				
+					<td>接收速率</td>
+					<td><textarea id="rxSpeed" style="height:20px;resize:none";></textarea></td>
+					<td>发送速率</td>
+					<td><textarea id="txSpeed" style="height:20px;resize:none";></textarea></td>
+					<td>磁盘写速率</td>
+					<td><textarea id="writeDiskSpeed" style="height:20px;resize:none";></textarea></td>
+					<td>磁盘读速率</td>
+					<td><textarea id="readDiskSpeed" style="height:20px;resize:none";></textarea></td>
+
+				</tr>
+	    	</table>
+	    
+	<div id="graph-info1" style="width:900px;"></div>
+	<td><a id="mem" style="width:400px;float:right;"></a></td>
+	<td><a id="cpu" style="width:400px;float:right;"></a></td>
+	<td><a id="data" style="width:400px;float:right;"></a></td>
+	<td><a id="disk" style="width:400px;float:right;"></a></td>
+	</div>
+ <script type="text/javascript">
+   var myChartcpu = new JSChart('cpu', 'line');			
+	var myDatacpu = new Array([1, 0], [2,0], [3,0], [4,0], [5,0], [6, 0], [7,0], [8,0], [9,0], [10,0]);
+	myChartcpu.setDataArray(myDatacpu);
+    myChartcpu.setIntervalStartY(0);
+    myChartcpu.setIntervalEndY(100);
+	myChartcpu.setLineSpeed(100);
+	myChartcpu.setTitle('CPU使用率');
+	myChartcpu.draw();
+	var myChartmem = new JSChart('mem', 'line');		
+	myChartmem.setDataArray([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9,0], [10,0]]);
+    myChartmem.setIntervalStartY(0);
+    myChartmem.setIntervalEndY(100);
+	myChartmem.setLineSpeed(100);
+	myChartmem.setTitle('内存使用率');
+	myChartmem.draw();
+			
+	var myChartdata = new JSChart('data', 'line');		
+	myChartdata.setDataArray([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9,0], [10,0]],'发送速率');
+	myChartdata.setDataArray([[1, 0], [2, 0], [3, 0], [4, 0], [5, 0], [6, 0], [7, 0], [8, 0], [9,0], [10,0]],'接收速率');
+	myChartdata.setLineSpeed(100);
+	myChartdata.setTitle('流量监控');
+	myChartdata.setLineColor('#FDCB3F', '接收速率');
+	myChartdata.setLegendShow(true);
+	myChartdata.draw();
+
+    var  myChartdisk = new JSChart('disk', 'line');		
+	 myChartdisk.setDataArray([[1, 0], [2, 0], [3,0], [4,0], [5,0], [6, 0], [7, 0], [8, 0], [9,0], [10,0]],'磁盘写入速率');
+	 myChartdisk.setDataArray([[1,0], [2, 0], [3,0], [4,0], [5,0], [6, 0], [7, 0], [8, 0], [9,0], [10,0]],'磁盘读取速率');
+	 myChartdisk.setLineSpeed(100);
+	 myChartdisk.setTitle('磁盘读写监控');
+	 myChartdisk.setLineColor('#FDCB3F', '磁盘读取速率');
+	 myChartdisk.setLegendShow(true);	
+	 myChartdisk.draw();		   
+function loadi(){
+$(function(){
+
+			$.post('monitor_action_show.action', function(result){
+			$('#aDate').text(result.aDate);
+			$('#cpuPerc').text(result.cpuPerc).append("%");
+			$('#memPerc').text(result.memPerc).append("%");
+			$('#xnetNums').text(result.xnetNums);
+			$('#rxSpeed').text(result.rxSpeed).append("KB/S");
+			$('#txSpeed').text(result.txSpeed).append("KB/S");	
+			$('#readDiskSpeed').text(result.readDiskSpeed).append("KB/S");
+			$('#writeDiskSpeed').text(result.writeDiskSpeed).append("KB/S");		
+  			myChartcpu = new JSChart('cpu', 'line');	
+ 			myChartcpu.setIntervalStartY(0);
+   		    myChartcpu.setIntervalEndY(100);		
+			myChartcpu.setLineSpeed(100);
+			myChartcpu.setTitle('CPU使用率');
+  			myChartcpu.setDataArray([[1, result.cpuPerc0], [2, result.cpuPerc1], [3, result.cpuPerc2], [4, result.cpuPerc3], [5, result.cpuPerc4], [6, result.cpuPerc5], [7, result.cpuPerc6], [8, result.cpuPerc7], [9,result.cpuPerc8], [10,result.cpuPerc9]]);
+			myChartcpu.draw();
+	 myChartmem = new JSChart('mem', 'line');		
+	myChartmem.setDataArray([[1, result.memPerc0], [2, result.memPerc1], [3, result.memPerc2], [4, result.memPerc3], [5, result.memPerc4], [6, result.memPerc5], [7, result.memPerc6], [8, result.memPerc7], [9,result.memPerc8], [10,result.memPerc9]]);
+    myChartmem.setIntervalStartY(0);
+    myChartmem.setIntervalEndY(100);
+	myChartmem.setLineSpeed(100);
+	myChartmem.setTitle('内存使用率');
+	myChartmem.draw();
+			
+	myChartdata = new JSChart('data', 'line');		
+	myChartdata.setDataArray([[1, result.txSpeed0], [2, result.txSpeed1], [3, result.txSpeed2], [4, result.txSpeed3], [5, result.txSpeed4], [6, result.txSpeed5], [7, result.txSpeed6], [8, result.txSpeed7], [9,result.txSpeed8], [10,result.txSpeed9]],'发送速率');
+	myChartdata.setDataArray([[1, result.rxSpeed0], [2, result.rxSpeed1], [3, result.rxSpeed2], [4, result.rxSpeed3], [5, result.rxSpeed4], [6, result.rxSpeed5], [7, result.rxSpeed6], [8, result.rxSpeed7], [9,result.rxSpeed8], [10,result.rxSpeed9]],'接收速率');
+	myChartdata.setLineSpeed(100);
+	myChartdata.setLineColor('#FDCB3F', '接收速率');
+	myChartdata.setTitle('流量监控');
+    myChartdata.setLegendShow(true);
+	myChartdata.draw();
+
+    myChartdisk = new JSChart('disk', 'line');		
+	 myChartdisk.setDataArray([[1, result.writeDiskSpeed0], [2, result.writeDiskSpeed1], [3,result.writeDiskSpeed2], [4,result.writeDiskSpeed3], [5,result.writeDiskSpeed4], [6, result.writeDiskSpeed5], [7, result.writeDiskSpeed6], [8, result.writeDiskSpeed7], [9,result.writeDiskSpeed8], [10,result.writeDiskSpeed9]],'磁盘写入速率');
+	 myChartdisk.setDataArray([[1, result.readDiskSpeed0], [2, result.readDiskSpeed1], [3,result.readDiskSpeed2], [4,result.readDiskSpeed3], [5,result.readDiskSpeed4], [6, result.readDiskSpeed5], [7, result.readDiskSpeed6], [8, result.readDiskSpeed7], [9,result.readDiskSpeed8], [10,result.readDiskSpeed9]],'磁盘读取速率');
+	 myChartdisk.setLineSpeed(100);
+	 myChartdisk.setLineColor('#FDCB3F', '磁盘读取速率');
+	 myChartdisk.setTitle('磁盘读写监控');	
+	 myChartdisk.setLegendShow(true);	
+	 myChartdisk.draw();
+	 result=null;
+						}, 'json');
+		});
+
+}
+
+
+var timer1;
+function start(){loadi();timer1 =setInterval(loadi,1000*3);}
+function stop(){
+     		clearInterval(timer1);
+     		$.post('monitor_action_reset.action', function(result){}, 'json');
+		}
+function send(){
+			
+			$.post('monitor_action_send.action',{email_add:$('#email_add').val()},function(result){
+			if(result.error){alert("发送邮件失败！");}
+			else{alert("发送邮件成功！");}
+			},'json');}           
+</script>
+
+	
+<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+	
+</body>
+</html>

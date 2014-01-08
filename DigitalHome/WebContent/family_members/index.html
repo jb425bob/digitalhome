@@ -1,0 +1,448 @@
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../scripts/datagrid-detailview.js"></script>
+</head>
+<body>
+		<div class="demo-info">
+			<div class="demo-tip icon-tip"></div>
+		</div>
+		<div style="margin:10px 0;"></div>
+		<div id="main_wrapper" style="width:900px;margin-left:20px;overflow:hidden;">	
+		<table id="gate_dg" style="width:820px;height:350px"
+			url="gate_action_show.action" 
+			toolbar="#family_toolbar" pagination="true" nowrap="false"
+					rownumbers="true" singleSelect="true"   pageSize="10">
+		<thead>
+			<tr>
+			    <th data-options="field:'online', align:'center', formatter:
+			    function(value,row,index){
+			    return '<img src=\'http://localhost:9090/plugins/presence/status?jid=' + row.snuser + '@pc--20120731qvk\'/>';
+			    }"> 在线状态 </th>
+			    <th data-options="field:'snuser', align:'center'">网关用户</th>
+				<th data-options="field:'password', align:'center'">密码</th>
+				<th data-options="field:'sncode', align:'center'">网关sn号</th>
+				<th data-options="field:'status', align:'center', width:60, formatter:
+				 function(val, rec){
+				 return val=='0'?'开启':'关闭';
+				 }">状态</th>
+				<th data-options="field:'province', align:'center', width:80">省份</th>
+				<th data-options="field:'city', align:'center', width:80">市</th>
+				<th data-options="field:'zone', align:'center', width:80">区</th>
+				<th data-options="field:'location', align:'center', width:140">地址</th>	
+						
+			</tr>
+		</thead>
+	</table>
+	<div id = "family_toolbar">
+				<table>
+				<tr>
+				    <td><span>所在省:</span></td>
+					<td><input id="search_province"></td>	
+					<td><span>所在市:</span></td>
+					<td><input id="search_city"></td>
+					<td><span>所在区:</span></td>
+					<td><input id="search_zone"></input></td>
+					<td><span>SN号:</span></td>
+					<td><input style="width:180px" id="search_sn"></input></td>
+					
+				</tr>
+				<tr>
+					<td><span>网关用户ID:</span></td>
+					<td><input  id="search_gateway"></input></td>
+					<td><a href="#" class="easyui-linkbutton" plain="true" onclick="onSearch()">search</a></td>
+				</tr>
+			</table>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newGate()">增加网关</a>
+				<!--  <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" >编辑快递员</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" >删除快递员</a>
+				编辑与删除操作功能-->
+				<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteGate()">删除网关</a>
+				<a href="#" class="easyui-linkbutton" iconCls="icon-add" plain="true" onclick="newMember()">添加家庭成员</a>
+				<!--  <a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="deleteMember()">删除家庭成员</a>
+			</div> mask -->
+			
+	</div>
+	<div id="gate_dlg" class="easyui-dialog" style="width:300px;height:320;padding:10px 20px"
+					closed="true" buttons="#gate_dlg_buttons" >
+				<div class="ftitle"> Gate Information</div>
+				<form id="gate_fm" method="post">
+					<div class="fitem">
+						<label>网关用户:</label>
+						<input name="snuser" class="easyui-validatebox" required="true" >
+					</div>
+					<div class="fitem">
+						<label>密码:</label>
+						<input name="password" class="easyui-validatebox" required="true">
+					</div>
+					<div class="fitem">
+						<label>sn号:</label>
+						<input name="sncode" class="easyui-validatebox" required="true" validType="length[28,28]" missingMessage="必须填写28位sn号 "  >
+					</div>
+					<div class="fitem">
+						<label>所在省：</label>
+						<select id="p1" style="width:132px;height:30" name="province" >
+						<option value="" selected="selected" >无</option>
+						</select>	
+					</div>		
+					<div class="fitem">
+						<label>所在市：</label>
+						<select id="c1"  style="width:132px;height:30" name="city">
+						<option value="" selected="selected" >无</option>
+						</select>
+					</div>	
+			    	<div class="fitem">
+						<label>所在区：</label>
+						<select id="z1"  style="width:132px;height:30" name="zone">	
+						<option value="" selected="selected" >无</option>
+                         </select>
+					</div>			
+					<div class="fitem">
+						<label>地址:</label>
+						<input name="location" class="easyui-validatebox">
+					</div>
+				</form>
+			</div>
+			<div id="gate_dlg_buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveGate()"> Save</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" cionCls="icon-cancel" onclick="javascript:$('#gate_dlg').dialog('close')">Cancel</a>	
+			</div>
+			<div id="member_dlg" class="easyui-dialog" style="width:300px;height:auto;padding:10px 20px"
+					closed="true" buttons="#member_dlg_buttons">
+				<div class="ftitle"> Member Information</div>
+				<form id="member_fm" method="post">
+					<div class="fitem">
+						<label>用户名:</label>
+						<input name="username" class="easyui-validatebox" required="true">
+					</div>
+					<div class="fitem">
+						<label>密码:</label>
+						<input name="password" class="easyui-validatebox" required="true">
+					</div>
+					<div class="fitem">
+						<label>家庭身份:</label>
+						<input id="type" name="type"  class="easyui-combobox"  required ="true" panelHeight="auto" data-options="
+								valueField: 'value',
+								textField: 'label',
+								data: [{
+									label: '普通成员',
+									value: '0'			
+								},{
+									label: '家庭户主',
+									value: '1'
+								}]" /> 
+					</div>
+					<div class="fitem">
+						<label>真实姓名:</label>
+						<input name="name" class="easyui-validatebox" required="true">
+					</div>
+					<div class="fitem">
+						<label>身份证号码:</label>
+						<input name="cardid" class="easyui-validatebox" required="true" validType="length[18,18]" missingMessage="18位身份证号 ">
+					</div>
+					<div class="fitem">
+						<label>联系电话1:</label>
+						<input name="phone1" class="easyui-validatebox" required="true">
+					</div>
+					<div class="fitem">
+						<label>联系电话2:</label>
+						<input name="phone2" class="easyui-validatebox">
+					</div>
+				</form>
+			</div>
+			<div id="member_dlg_buttons">
+				<a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-ok" onclick="saveMember()"> Save</a>
+				<a href="javascript:void(0)" class="easyui-linkbutton" cionCls="icon-cancel" onclick="javascript:$('#member_dlg').dialog('close')">Cancel</a>	
+			</div>
+			</div>
+	<script type="text/javascript">
+		$(function(){
+			$('#gate_dg').datagrid({
+				collapsible:true,
+				view: detailview,
+				detailFormatter:function(index,row){
+					return '<div style="padding:2px"><table id="ddv-' + row.snuser + '"></table></div>';
+				},
+				onExpandRow: function(index,row){
+					$('#ddv-'+row.snuser).datagrid({
+						url:'member_action_show.action?id='+row.snuser,
+						pageSize:'10',
+						singleSelect:true,
+						rownumbers:true,
+						loadMsg:'',
+						title:'家庭成员',
+						height:'auto',
+						columns:[[
+						    {field:'online',title:'在线状态',align:'center',formatter:function(value,row,index){
+						    	return '<img src="http://localhost:9090/plugins/presence/status?jid=' + row.username + '@pc--20120731qvk" />';
+						    }},
+							{field:'username',title:'用户名'},
+							{field:'snuser', title:'网关用户'},
+							{field:'type',title:'家庭身份',align:'center',formatter:function(value,row, index){
+								 return value=='0'?'成员':'户主';
+							}},
+							{field:'isbind',title:'已绑定网关',align:'center',formatter:function(value,row, index){
+								 return value=='0'?'否':'是';
+							}},
+							{field:'name',title:'真实姓名',align:'center'},
+							{field:'cardid',title:'身份证号',align:'center'},
+							{field:'password',title:'密码',align:'center'},
+							{field:'phone1',title:'phone1',align:'center'},
+							{field:'phone2',title:'phone2',align:'center'},
+							{field:'action',title:'Action',align:'center', 
+								formatter:	function(value,row,index){
+									var d = '<a href="#" onclick="deletemember(\''+ row.username + '\',\''+row.isbind +'\',\'' + row.snuser +'\')">删除</a>';
+									if(row.isbind == '0'){
+										var b = '<a href="#" onclick="bind2gate(\''+ row.username + '\',\''+row.snuser +'\')">绑定网关</a>   ';
+				
+										return b + d;
+									}else{
+										var c = '<a href="#" onclick="unbind2gate(\''+ row.username + '\',\'' + row.snuser +'\')">取消绑定</a>   ';
+										return c + d;
+									}
+								
+								}
+							}
+						]],
+						onResize:function(){
+							$('#gate_dg').datagrid('fixDetailRowHeight',index);
+						},
+						onLoadSuccess:function(){
+							setTimeout(function(){
+								$('#gate_dg').datagrid('fixDetailRowHeight',index);
+							},0);
+						}
+					});
+					$('#gate_dg').datagrid('fixDetailRowHeight',index);
+				}
+			});
+			var selValue1;
+			var selValue2;
+			$.each(pro, function (k, p) { 
+		           var option = "<option value='" + p.ProName + "'>" + p.ProName + "</option>";
+		           $("#p1").append(option);
+		            }); 
+		                $("#p1").change(function () {
+		                $("#c1 option:gt(0)").remove();
+		                var selLabel1 = $("#p1").val(); 
+		         
+		                $.each(pro,function(k,p){
+		                if(p.ProName==selLabel1)
+		                 selValue1=p.ProID;
+		                });    
+		                $.each(cit, function (k, p) { 
+		                    if (p.ProID == selValue1) {
+		                        var option = "<option value='" + p.CityName + "'>" + p.CityName + "</option>";
+		                        $("#c1").append(option);
+		                    }
+		                });
+		                 
+		            }); 
+		            $("#c1").change(function () {
+		                
+		               $("#z1 option:gt(0)").remove(); 
+		               var sellabel2 = $(this).val();
+		                $.each(cit,function(k,p){
+		                if(p.CityName==sellabel2)
+		                 selValue2=p.CityID;
+		                });    
+		                $.each(dis, function (k, p) {
+		                    if (p.CityID == selValue2) {
+		                        var option = "<option value='" + p.DisName + "'>" + p.DisName + "</option>";
+		                        $("#z1").append(option);
+		                    }
+		                }); 
+		            }); 
+		}
+		);
+		var url;
+		var index;
+		function newGate(){
+			
+			 $('#gate_dlg').dialog('open').dialog('setTitle', 'New Gate');
+			 //$('#gate_fm').form('clear');
+			 url = 'gate_action_add.action';
+		}
+		function deleteGate(){
+			 var row = $('#gate_dg').datagrid('getSelected');
+			 index = row.snuser;
+			 var delete_url;
+			 if(row){ 
+					$.messager.confirm('Confirm', '确定删除网关?', function(r){
+						if(r){
+							$.post('gate_action_delete.action?id='+ row.snuser, function(result){
+								if(!result.error){
+									alert("删除成功！")
+									$('#gate_dg').datagrid('reload');
+								} else{
+								
+									$.messager.show({
+										title: 'Error',
+										msg: result.errorMsg
+									});
+								}
+							}, 'json')
+						}
+					});
+			 }
+		
+		}
+		
+		 function saveGate(){
+			 var province = $('#p1').val();
+			 var city =  $('#c1').val();
+			 var zone = $('#z1').val();
+			 //alert( province + city + zone);
+			 if(province == '' || city == '' || zone == ''){
+				 alert('请选择省、市、区！');
+				 return ;
+			 }
+			 $('#gate_fm').form('submit', {
+				 url:url,
+				 onSubmit: function(){
+					 return $(this).form('validate');
+				 },
+			 	 success: function(result){
+			 		 var result  = eval(' ('+result+')');
+			 	//	alert(result.error);
+			 		 if(result.error){
+			 			 $.messager.show({
+			 				 title: 'Error',
+			 				 msg: result.errorMsg
+			 			 })
+			 		 } else{
+			 			 alert("添加网关成功！");
+			 			 $('#gate_dlg').dialog('close');
+			 			 $('#gate_dg').datagrid('reload');
+			 		 }
+			 	 }
+			 })	;
+		 }
+		 function newMember(){
+				
+			 var row = $('#gate_dg').datagrid('getSelected');
+			 index = row.snuser;
+			 if(row){
+				 $('#member_dlg').dialog('open').dialog('setTitle', 'New Member');
+				 $('#member_fm').form('clear');
+				 url = 'member_action_add.action' + '?id=' + row.snuser ;
+			 }
+		 }
+		 function saveMember(){
+			 $('#member_fm').form('submit', {
+				 url:url,
+				 onSubmit: function(){
+					 return $(this).form('validate');
+				 },
+			 	 success: function(result){
+			 		 var result  = eval(' ('+result+')');
+			 	//	alert(result.error);
+			 		 if(result.error){
+			 			 $.messager.show({
+			 				 title: 'Error',
+			 				 msg: result.errorMsg
+			 			 })
+			 		 } else{
+			 			 alert("添加家庭用户成功！");
+			 			 $('#member_dlg').dialog('close');
+			 			 $('#ddv-' + index).datagrid('reload' );
+			 		 }
+			 	 }
+			 })	;
+			 
+		 }
+		 
+		 function bind2gate(username,sncode){
+			 	 $.post('member_action_bind.action?ofroster1='+ username +'&ofroster2='+sncode , function(result){
+								if(!result.error){
+									alert('用户:' + username + ' 绑定网关成功');
+									$('#ddv-' + sncode).datagrid('reload');
+								} else{
+									$.messager.show({
+										title: 'Error',
+										msg: result.errorMsg
+									});
+								}
+							}, 'json') 
+			 //$('#ddv-'+sncode).datagrid('reload');
+			/* var tr = $(target).closest('tr.datagrid-row');
+			alert(tr.attr('datagrid-row-index')); */
+		 }
+		 function unbind2gate(username, sncode){
+		 	 $.post('member_action_unbind.action?ofroster1='+ username +'&ofroster2='+sncode , function(result){
+					if(!result.error){
+						alert('用户' + username + '取消绑定网关成功');
+						$('#ddv-' + sncode).datagrid('reload');
+					} else{
+						$.messager.show({
+							title: 'Error',
+							msg: result.errorMsg
+						});
+					}
+				}, 'json') 		 
+			 
+		 }
+		 function deletemember(username, isbind, sncode){
+			 if(isbind =='1'){
+				 alert("请先取消绑定网关，然后删除！");
+			 }else{
+				 $.messager.confirm('Confirm', '确定删除用户?', function(r){
+						if(r){
+							$.post('member_action_delete.action?id='+ username, function(result){
+								if(!result.error){
+									alert("删除成功！")
+									$('#ddv-' + sncode).datagrid('reload');
+								} else{
+								
+									$.messager.show({
+										title: 'Error',
+										msg: result.errorMsg
+									});
+								}
+							}, 'json')
+						}
+					});
+			 }
+			 
+		 }
+		 function onSearch(){
+				$('#gate_dg').datagrid('load', {
+					province:$('#search_province').val(),
+					city:$('#search_city').val(),
+					zone:$('#search_zone').val(),
+					sncode:$('#search_sn').val(),
+					snuser:$('#search_gateway').val()
+				});
+			}
+	</script>
+		<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+	
+</body>
+</html>

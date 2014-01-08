@@ -1,0 +1,107 @@
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<link href="../styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="../themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="../themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="../themes/demo.css">
+	<script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="../scripts/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="../scripts/datagrid-detailview.js"></script>
+</head>
+<body>
+		<div class="demo-info">
+			<div class="demo-tip icon-tip"></div>
+		</div>
+		<div style="margin:10px 0;"></div>
+		<div id="main_wrapper" style="width:900px;margin-left:20px;overflow:hidden;">	
+		<table id="device_dg" style="width:820px;height:350px"
+			url="gate_action_show.action" 
+			singleSelect="true"  pagination="true" nowrap="false" 
+					rownumbers="true"   pageSize="10">
+		<thead>
+			<tr>
+				<th data-options="field:'snuser', align:'center'">网关用户</th>
+				<th data-options="field:'password', align:'center'">密码</th>
+				<th data-options="field:'sncode', align:'center'">网关sn号</th>
+				<th data-options="field:'status', align:'center', width:60, formatter:
+				 function(val, rec){
+				 return val=='0'?'开启':'关闭';
+				 }">状态</th>
+				<th data-options="field:'province', align:'center', width:80">省份</th>
+				<th data-options="field:'city', align:'center', width:80">市</th>
+				<th data-options="field:'zone', align:'center', width:80">区</th>
+				<th data-options="field:'location', align:'center', width:140">地址</th>			
+			</tr>
+		</thead>
+	</table>
+	</div>
+	<script type="text/javascript">
+		$(function(){
+			$('#device_dg').datagrid({
+				collapsible:true,
+				view: detailview,
+				detailFormatter:function(index,row){
+					return '<div style="padding:2px"><table id="ddv--' + row.snuser + '"></table></div>';
+				},
+				onExpandRow: function(index,row){
+					
+					$('#ddv--'+row.snuser).treegrid({
+						url: 'device_action_show.action?id='+row.sncode,
+						treeField: 'category',
+						idField: 'id',
+						rownumbers: true,
+						animate: true,
+						rownumbers: true,
+						height:'auto',
+						columns:[[
+							{field:'category',title:'设备类型',width:180},
+							{field:'name',title:'设备内容',align:'center',width:120},			
+						]],
+						onExpand:function(){
+							//alert("xxx");
+							$('#device_dg').datagrid('fixDetailRowHeight',index);
+						},
+						onCollapse:function(){
+							//alert("xxx");
+							$('#device_dg').datagrid('fixDetailRowHeight',index);
+						},
+						onResize:function(){
+							$('#device_dg').datagrid('fixDetailRowHeight',index);
+						},
+						onLoadSuccess:function(){
+							setTimeout(function(){
+								$('#device_dg').datagrid('fixDetailRowHeight',index);
+							},0);
+						}
+					});
+					$('#device_dg').datagrid('fixDetailRowHeight',index);
+				}
+			});
+		})
+	</script>
+		<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+	
+</body>
+</html>

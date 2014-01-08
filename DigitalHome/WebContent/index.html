@@ -1,0 +1,138 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>管理员登录</title>
+	<link href="styles/base.css" type="text/css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="themes/default/easyui.css">
+	<link rel="stylesheet" type="text/css" href="themes/icon.css">
+	<link rel="stylesheet" type="text/css" href="themes/demo.css">
+	<script type="text/javascript" src="scripts/jquery-1.7.2.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="scripts/jquery.md5.js"></script>
+	
+</head>
+<body>
+	<div id="head">
+		<a id="logo" href="#">logo</a>
+		<strong id="description">description</strong>
+		<div id="menu">
+		<!--  	<a href="/WLZTJ/admin/index.html" class="easyui-linkbutton" data-options="plain:true">管理员</a>
+			<a href="/WLZTJ/ztj/index.html" class="easyui-linkbutton" data-options="plain:true">物流自提机</a>
+			<a href="/WLZTJ/kdy/index.html" class="easyui-linkbutton" data-options="plain:true">快递员</a>
+			<a href="/WLZTJ/kd/index.html" class="easyui-linkbutton" data-options="plain:true">快递</a>
+			<a href="/WLZTJ/sms/index.html" class="easyui-linkbutton" data-options="plain:true">短信息</a>-->
+		</div>
+				
+	</div>
+	<div id="content" style="">
+		<div style="margin:70px;"></div>
+		<div style="width:900px;margin:0 auto;padding:10px;">
+			<div class="panel" style="padding-left:280px;padding-right:280px;" >		
+		        <div id="admin_login" style="padding:20px;overflow:hidden;min-height:220px;border:1px solid #ddd;">
+		        	<div class="ftitle"> 管理员登录</div>
+					<div id="panel-demo">
+					 <form id="ff"   action="admin_action_login"  method="post">
+				    	<table  style="margin:0 auto">
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td>管理员ID</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input sytle="width:50px" class="easyui-validatebox" type="text" name="_user" data-options="required:true"></input></td>
+				    			
+				    		</tr>
+					    	<tr>
+				    			<td>管理员密码</td>
+				    		</tr>
+				    		<tr>
+				    			<td><input  id = "login" sytle="width:50px" class="easyui-validatebox" type="password" name="_pwd" data-options="required:true"></input></td>	
+				    		</tr>
+				    		<tr>
+				    			<td style="width:10px">&nbsp;</td>
+				    		</tr>
+				    		<tr>
+				    			<td><a  class="easyui-linkbutton" onclick="submitForm()">登录</a></td>
+				    		</tr>
+				    	</table>
+				      </form>
+				    </div>	
+				</div>
+			</div>	      
+		</div>	
+    </div>	
+<script type="text/javascript">
+	$(function(){
+		$('#panel-demo').panel({
+			width:300,
+			height:200,
+			title:' '
+			});
+	/* 	$('#login').keypress(function(e){
+			if(e.which == 13){
+		/* 		$('#ff').form('submit',{
+					success:function(_ret){   
+							//alert(_ret);
+							if(_ret == 1)
+					        location.href = "/WLZTJ/ztj/" ;
+							else
+								alert("用户名或密码错误！")
+						
+						  } }); 
+						  alert('enter');
+			}
+			return false;
+		}) */
+			}
+
+	)
+	 
+</script>
+
+
+<script>
+		function submitForm(){
+			$('#ff').form('submit',{
+				    onSubmit:function(){
+				    	
+				    	$('#login').val($.md5($('#login').val()));
+				    },
+					success:function(_ret){   
+							//alert(_ret);
+							if(_ret == 1)
+					        location.href = "./main.html" ;
+							else
+								alert("用户名或密码错误！")
+						
+						  } });
+		}
+	</script>
+	<style type="text/css">
+		#fm{
+			margin:0;
+			padding:10px 30px;
+		}
+		.ftitle{
+			font-size:14px;
+			font-weight:bold;
+			padding:5px 0;
+			margin:0 auto;
+			margin-bottom:10px;
+			border-bottom:1px solid #ccc;
+			
+		}
+		.fitem{
+			margin-bottom:5px;
+		}
+		.fitem label{
+			display:inline-block;
+			width:80px;
+		}
+	</style>
+</body>
+</html>
